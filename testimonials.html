@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoneStar Ridgebacks Testimonials</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Droid+Serif:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #F8F4EF;
+            color: #754530;
+            line-height: 1.6;
+        }
+
+        .carousel-container {
+            max-width: 1400px; /* increased from 1200px */
+            margin: 60px auto;
+            padding: 0 20px;
+            position: relative;
+        }
+
+
+
+        .carousel-wrapper {
+            position: relative;
+            overflow: visible; /* Changed from hidden to show expanded content */
+            border-radius: 12px;
+            min-height: 300px;
+            padding: 40px 0;
+            margin: 0 auto;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            gap: 24px;
+            padding: 0;
+            margin-left: 50%; /* Add margin to help with centering */
+            cursor: grab;
+            user-select: none;
+        }
+
+        .carousel-track:active {
+            cursor: grabbing;
+        }
+
+        .carousel-track.dragging {
+            transition: none;
+        }
+
+        .testimonial-card {
+            flex: 0 0 600px; /* Increased from 400px */
+            min-height: 200px;
+            background: white;
+            border-radius: 12px;
+            padding: 24px 20px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transform: scale(0.85);
+            opacity: 0.5;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .testimonial-card.center {
+            transform: scale(1.1);
+            opacity: 1;
+            box-shadow: 0 20px 40px rgba(117, 69, 48, 0.1); /* Updated shadow color and values */
+            z-index: 3; /* Increased z-index */
+        }
+
+        .testimonial-card:not(.center) {
+            filter: blur(0.5px); /* Subtle blur for non-centered cards */
+        }
+
+        .testimonial-card.expanded {
+            max-height: none;
+            height: auto;
+            transform: scale(1.1);
+        }
+
+        .stars {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 4px;
+        }
+
+        .star {
+            color: #7E6F63;
+            font-size: 1.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .testimonial-card.center .star {
+            color: #541900;
+        }
+
+        .quote-container {
+            flex: 1;
+            position: relative;
+            margin-bottom: 24px;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .quote {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #754530;
+            max-height: 100px;
+            overflow: hidden;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .quote.expanded {
+            max-height: 2000px;
+        }
+
+        .quote-text {
+            position: relative;
+            z-index: 1;
+            padding-left: 20px;
+        }
+
+        .show-more-btn {
+            background: none;
+            border: none;
+            color: #7E6F63;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 12px;
+            padding: 0;
+            transition: color 0.3s ease;
+        }
+
+        .show-more-btn:hover {
+            color: #541900;
+        }
+
+        .show-more-btn:focus {
+            outline: 2px solid #7E6F63;
+            outline-offset: 2px;
+        }
+
+        .author-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: auto;
+            justify-content: center;
+        }
+
+        .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7E6F63, #541900);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .author-name {
+            font-family: 'Droid Serif', serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #541900;
+        }
+
+        .dots-container {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 10px; /* reduced from 40px */
+            position: relative;
+            z-index: 2;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #7E6F63;
+            opacity: 0.3;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            padding: 0;
+        }
+
+        .dot:hover {
+            opacity: 0.6;
+            transform: scale(1.1);
+        }
+
+        .dot:focus {
+            outline: 2px solid #7E6F63;
+            outline-offset: 2px;
+        }
+
+        .dot.active {
+            opacity: 1;
+            transform: scale(1.2);
+            background: #541900;
+        }
+
+        /* Responsive breakpoints */
+        @media (max-width: 900px) {
+            .carousel-track {
+                padding: 0 calc((100% - 50% * 2 - 24px) / 2);
+            }
+            
+            .testimonial-card {
+                flex: 0 0 calc(50% - 12px);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .carousel-track {
+                padding: 0 20px;
+            }
+            
+            .testimonial-card {
+                flex: 0 0 calc(100% - 40px);
+            }
+            
+            .carousel-title {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .testimonial-card {
+                padding: 20px 16px;
+                min-height: 320px;
+            }
+            
+            .quote {
+                font-size: 0.95rem;
+                height: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="carousel-container">
+        <div class="carousel-wrapper">
+            <div class="carousel-track" id="carousel-track">
+                <!-- Testimonial cards will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <div class="dots-container" id="dots-container">
+            <!-- Dots will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        const testimonialData = [
+            {
+                text: "[Tod is in] excellent health and what a fantastic personality. Tod is the most loving and affectionate dog that we have ever known.",
+                author: "Rayna",
+                initials: "R"
+            },
+            {
+                text: "From the first message we sent inquiring about adopting, they were very responsive. They were very open and inviting with their answers. We are the type of family that asks tons of questions whenever we make a drastic change with our lives. They gave honest answers and we had several long conversations over the phone. Once we decided to adopt and chose LoneStar Ridgebacks as our adoption place, they worked with our schedules for when we could come pick up our girl. We did FaceTime and videos on her tricks, her silliness with her siblings and mom, and received updates on her milestones in her little life. When we picked her up, LoneStar Ridgebacks had her ready to go. We got a sample of her treats, vitamins, food, her first photo book, and tons more answers to questions that popped into our heads as we picked up our little one. Once we journey home, we have continued to have LoneStar Ridgebacks in our family. Sharing our new milestones and fun adventures in country life.",
+                author: "Andi R.",
+                initials: "AR"
+            },
+            {
+                text: "Amazing! You guys were always available to answer my questions, and FaceTiming to us to meet Tank before adopting was such a big help! It alleviated my worries about adopting, and I appreciated that you guys made sure we would be a good match for Tank (Joey).",
+                author: "Frankie C",
+                initials: "FC"
+            },
+            {
+                text: "Lonestar Ridgebacks does their best to build relationships with owners before, during, and after adoption to ensure the very best outcome for their dogs and adopters. I believe they do their due diligence to ensure best practice breeding procedures are being followed. They really care about the lifelong well being of their puppies.",
+                author: "Frankie C",
+                initials: "FC"
+            },
+            {
+                text: "[You] guys care about your operation. Charlotte is very smart and willing to learn.",
+                author: "Jason N",
+                initials: "JN"
+            },
+            {
+                text: "[Our puppy] is very healthy and intelligent. She loves water and to play with other dogs. [She's] very social.",
+                author: "Carrie N",
+                initials: "CN"
+            },
+            {
+                text: "Their puppy raising process was top notch. [We chose LoneStar Ridgebacks because] of amount the puppy was trained before we met her.",
+                author: "Gary F",
+                initials: "GF"
+            },
+            {
+                text: "[Our puppy] is the perfect combination of endearing menace and cuddle bug.",
+                author: "Joe F",
+                initials: "JF"
+            },
+            {
+                text: "[LoneStar Ridgebacks] was a pleasure to work with! They are experienced and knowledgeable with this particular breed.",
+                author: "Vicki S.",
+                initials: "VS"
+            },
+            {
+                text: "[Our puppy is] very confident, easy with other dogs and people, and has no health problems.",
+                author: "Steve Z.",
+                initials: "SZ"
+            }
+        ];
+
+        class TestimonialCarousel {
+            constructor() {
+                this.currentIndex = 0;
+                this.totalTestimonials = testimonialData.length;
+                this.track = document.getElementById('carousel-track');
+                this.dotsContainer = document.getElementById('dots-container');
+                this.autoPlayInterval = null;
+                this.isHovered = false;
+                
+                this.init();
+            }
+
+            init() {
+                this.createTripleTestimonials();
+                this.createDots();
+                this.updateCarousel();
+                this.startAutoPlay();
+                this.addEventListeners();
+            }
+
+            createTripleTestimonials() {
+                // Create triple set for infinite loop
+                const tripleData = [...testimonialData, ...testimonialData, ...testimonialData];
+                
+                tripleData.forEach((testimonial, index) => {
+                    const card = this.createTestimonialCard(testimonial, index);
+                    this.track.appendChild(card);
+                });
+            }
+
+            toggleQuote(cardIndex) {
+                const quote = document.getElementById(`quote-${cardIndex}`);
+                const card = quote.closest('.testimonial-card');
+                const button = quote.parentElement.querySelector('.show-more-btn');
+                
+                // First collapse any other expanded cards
+                document.querySelectorAll('.testimonial-card.expanded').forEach(expandedCard => {
+                    if (expandedCard !== card) {
+                        const expandedQuote = expandedCard.querySelector('.quote');
+                        const expandedBtn = expandedCard.querySelector('.show-more-btn');
+                        expandedQuote.classList.remove('expanded');
+                        expandedCard.classList.remove('expanded');
+                        expandedBtn.textContent = 'Show More';
+                    }
+                });
+
+                if (card.classList.contains('expanded')) {
+                    quote.classList.remove('expanded');
+                    card.classList.remove('expanded');
+                    button.textContent = 'Show More';
+                } else {
+                    quote.classList.add('expanded');
+                    card.classList.add('expanded');
+                    button.textContent = 'Show Less';
+                }
+            }
+
+            createTestimonialCard(testimonial, index) {
+                const card = document.createElement('div');
+                card.className = 'testimonial-card';
+                
+                const needsShowMore = testimonial.text.length > 180;
+                
+                card.innerHTML = `
+                    <div class="stars">
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                    </div>
+                    <div class="quote-container">
+                        <div class="quote" id="quote-${index}">
+                            ${testimonial.text}
+                        </div>
+                        ${needsShowMore ? `<button class="show-more-btn" onclick="carousel.toggleQuote(${index})" aria-label="Show full text">
+                            Show More
+                        </button>` : ''}
+                    </div>
+                    <div class="author-info">
+                        <div class="avatar">${testimonial.initials}</div>
+                        <div class="author-name">${testimonial.author}</div>
+                    </div>
+                `;
+                return card;
+            }
+
+            createDots() {
+                for (let i = 0; i < this.totalTestimonials; i++) {
+                    const dot = document.createElement('button');
+                    dot.className = 'dot';
+                    dot.setAttribute('aria-label', `Go to testimonial ${i + 1}`);
+                    dot.onclick = () => this.goToSlide(i);
+                    this.dotsContainer.appendChild(dot);
+                }
+            }
+
+            updateCarousel() {
+                const cards = this.track.querySelectorAll('.testimonial-card');
+                const dots = this.dotsContainer.querySelectorAll('.dot');
+                
+                // Update card positions and center card
+                cards.forEach((card, index) => {
+                    card.classList.remove('center');
+                    // Collapse any expanded cards that are no longer centered
+                    if (card.classList.contains('expanded')) {
+                        const quote = card.querySelector('.quote');
+                        const button = card.querySelector('.show-more-btn');
+                        quote.classList.remove('expanded');
+                        card.classList.remove('expanded');
+                        button.textContent = 'Show More';
+                    }
+
+                    const centerIndex = this.currentIndex + this.totalTestimonials;
+                    if (index === centerIndex) {
+                        card.classList.add('center');
+                    }
+                });
+
+                // Update dots
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === this.currentIndex);
+                });
+
+                // Center the current card
+                const cardWidth = 600; // Updated to match new flex-basis
+                const cardGap = 24;
+                const offset = -(this.currentIndex + this.totalTestimonials) * (cardWidth + cardGap) - (cardWidth / 2);
+                this.track.style.transform = `translateX(${offset}px)`;
+            }
+
+            nextSlide() {
+                this.currentIndex = (this.currentIndex + 1) % this.totalTestimonials;
+                this.updateCarousel();
+            }
+
+            prevSlide() {
+                // Instead of going backwards, go forward to the end
+                this.currentIndex = (this.currentIndex + this.totalTestimonials - 1) % this.totalTestimonials;
+                this.updateCarousel();
+            }
+
+            goToSlide(index) {
+                this.currentIndex = index;
+                this.updateCarousel();
+            }
+
+            startAutoPlay() {
+                this.autoPlayInterval = setInterval(() => {
+                    if (!this.isHovered) {
+                        this.nextSlide();
+                    }
+                }, 10000); // Changed from 5000 to 10000
+            }
+
+            stopAutoPlay() {
+                if (this.autoPlayInterval) {
+                    clearInterval(this.autoPlayInterval);
+                    this.autoPlayInterval = null;
+                }
+            }
+
+            addEventListeners() {
+                const container = document.querySelector('.carousel-container');
+                let isDragging = false;
+                let startX = 0;
+                let currentTranslate = 0;
+
+                this.track.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    startX = e.clientX;
+                    this.track.classList.add('dragging');
+                    this.isHovered = true;
+                    
+                    // Get the current translation value in pixels
+                    const transform = this.track.style.transform;
+                    const match = transform.match(/translateX\((-?\d+(?:\.\d+)?)px\)/);
+                    currentTranslate = match ? parseFloat(match[1]) : 0;
+                    
+                    e.preventDefault();
+                });
+
+                document.addEventListener('mousemove', (e) => {
+                    if (!isDragging) return;
+                    
+                    const x = e.clientX;
+                    const walk = x - startX;
+                    this.track.style.transform = `translateX(${currentTranslate + walk}px)`;
+                });
+
+                document.addEventListener('mouseup', (e) => {
+                    if (!isDragging) return;
+                    
+                    isDragging = false;
+                    this.track.classList.remove('dragging');
+                    this.isHovered = false;
+                    
+                    const movedBy = e.clientX - startX;
+                    const cardWidth = 624; // Updated card width (600) + gap (24)
+                    
+                    if (Math.abs(movedBy) > cardWidth / 3) {
+                        if (movedBy > 0) {
+                            this.prevSlide();
+                        } else {
+                            this.nextSlide();
+                        }
+                    } else {
+                        this.updateCarousel();
+                    }
+                });
+
+                // Touch/swipe support
+                let touchStartX = 0;
+                let touchEndX = 0;
+                
+                this.track.addEventListener('touchstart', (e) => {
+                    touchStartX = e.changedTouches[0].screenX;
+                    this.isHovered = true;
+                });
+                
+                this.track.addEventListener('touchend', (e) => {
+                    touchEndX = e.changedTouches[0].screenX;
+                    this.handleSwipe(touchStartX, touchEndX);
+                    this.isHovered = false;
+                });
+
+                // Keyboard navigation
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft') {
+                        this.prevSlide();
+                    } else if (e.key === 'ArrowRight') {
+                        this.nextSlide();
+                    }
+                });
+            }
+
+            handleSwipe(startX, endX) {
+                const threshold = 60;
+                const diff = startX - endX;
+
+                if (Math.abs(diff) > threshold) {
+                    if (diff > 0) {
+                        this.nextSlide();
+                    } else {
+                        this.prevSlide();
+                    }
+                }
+            }
+        }
+
+        // Initialize carousel when DOM is loaded
+        let carousel;
+        document.addEventListener('DOMContentLoaded', () => {
+            carousel = new TestimonialCarousel();
+        });
+    </script>
+</body>
+</html>
